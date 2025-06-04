@@ -10,16 +10,51 @@ mv_dec1='MultiviewDecoderBlock_max',mv_dec2='MultiviewDecoderBlock_max', enc_min
 # 1000 @ Aria_Seq(num_views=13, split='test', resolution=224, seed=666) + \
 # 1000 @ Co3d_Seq(num_views=13, sel_num=3, degree=180, mask_bg='rand', split='test', resolution=224, seed=666)"
 
-TRAIN_DATASET="[1000 @ SevenScenes_Seq(scene_id='chess', seq_id=1, filter=True, sample_freq=3, num_views=13, aug_crop=256, resolution=224, transform=ColorJitter, seed=233) \
-1000 @ SevenScenes_Seq(scene_id='chess', seq_id=2, filter=True, sample_freq=3, num_views=13, aug_crop=256, resolution=224, transform=ColorJitter, seed=233) \
-1000 @ SevenScenes_Seq(scene_id='chess', seq_id=4, filter=True, sample_freq=3, num_views=13, aug_crop=256, resolution=224, transform=ColorJitter, seed=233) \
-1000 @ SevenScenes_Seq(scene_id='chess', seq_id=6, filter=True, sample_freq=3, num_views=13, aug_crop=256, resolution=224, transform=ColorJitter, seed=233) ]"
-TEST_DATASET="[1000 @ SevenScenes_Seq(scene_id='chess', seq_id=3, filter=True, sample_freq=3, num_views=13, resolution=224, seed=666)"
+TRAIN_DATASET="[ 1000 @ SevenScenes_Seq(
+            scene_id='chess',
+            set_class='train',
+            seq_id=1,
+            num_views=3,
+            sample_freq=20,
+            start_freq=1,
+            resolution=(224, 224)), 
+1000 @ SevenScenes_Seq(
+            scene_id='chess',
+            set_class='train',
+            seq_id=2,
+            num_views=3,
+            sample_freq=20,
+            start_freq=1,
+            resolution=(224, 224)),
+1000 @ SevenScenes_Seq(
+            scene_id='chess',
+            set_class='train',
+            seq_id=4,
+            num_views=3,
+            sample_freq=20,
+            start_freq=1,
+            resolution=(224, 224)),
+1000 @ SevenScenes_Seq(
+            scene_id='chess',
+            set_class='train',
+            seq_id=6,
+            num_views=3,
+            sample_freq=20,
+            start_freq=1,
+            resolution=(224, 224))]"
+TEST_DATASET="[1000 @ SevenScenes_Seq(
+            scene_id='chess',
+            set_class='test',
+            seq_id=3,
+            num_views=3,
+            sample_freq=20,
+            start_freq=1,
+            resolution=(224, 224))]"
 
 PRETRAINED="checkpoints/slam3r_l2w.pth"
 TRAIN_OUT_DIR="checkpoints/slam3r_7scenes_l2w"
 
-torchrun --nproc_per_node=1 --master-port=29501 train.py \
+python train.py \
     --train_dataset "${TRAIN_DATASET}" \
     --test_dataset "${TEST_DATASET}" \
     --model "$MODEL" \
@@ -27,11 +62,11 @@ torchrun --nproc_per_node=1 --master-port=29501 train.py \
     --test_criterion "Jointnorm_Regr3D(L21, norm_mode=None)" \
     --pretrained $PRETRAINED \
     --pretrained_type "slam3r" \
-    --lr 5e-5 --min_lr 5e-7 --warmup_epochs 20 --epochs 200 --batch_size 2 --accum_iter 2 \
-    --save_freq 2 --keep_freq 20 --eval_freq 1 --print_freq 20\
+    --lr 5e-5 --min_lr 5e-7 --warmup_epochs 1 --epochs 3 --batch_size 2 --accum_iter 1 \
+    --save_freq 2 --keep_freq 20 --eval_freq 1 --print_freq 100\
     --save_config\
     --output_dir $TRAIN_OUT_DIR \
     --freeze "encoder"\
     --loss_func "l2w" \
-    --ref_ids 0 1 2 3 4 5
+    --ref_ids 0
 
