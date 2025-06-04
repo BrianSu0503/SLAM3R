@@ -29,6 +29,7 @@ torch.backends.cuda.matmul.allow_tf32 = True  # for gpu >= Ampere and pytorch >=
 import pycuda.driver as cuda
 
 from slam3r.datasets import get_multi_data_loader  # noqa
+from slam3r.datasets.seven_scenes_seq import SevenScenes_Seq
 from slam3r.losses import *  # noqa: F401, needed when loading the model
 from slam3r.models import *
 from slam3r.inference import loss_of_one_batch
@@ -106,6 +107,7 @@ def get_args_parser():
 
 
 def main(args):
+    # args.distributed = False
     misc.init_distributed_mode(args)  #1.set args 2.set torch device 3.init_process_group 4.modify builtin "print" func
     global_rank = misc.get_rank()
     world_size = misc.get_world_size()
